@@ -20,7 +20,7 @@
 
 ## 使用方法
 
-1. 直接在浏览器中打开 `index.html` 文件
+1. 直接在浏览器中打开 https://kiritoxf.github.io/kingdom-come-deliverance-2-alchemy-guide/
 2. 使用搜索框输入关键词进行查询
 3. 点击材料标签或底料标签进行筛选
 4. 点击配方卡片查看详细炼金步骤
