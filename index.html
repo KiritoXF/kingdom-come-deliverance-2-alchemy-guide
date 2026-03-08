@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天国拯救2炼金配方检索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #8B4513;
+        }
+        
+        .search-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .search-section {
+            margin-bottom: 12px;
+        }
+        
+        .search-section h2 {
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #555;
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 8px 30px 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .clear-btn:hover {
+            color: #333;
+        }
+        
+        .materials-selector,
+        .base-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .material-tag,
+        .base-material-tag {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .material-tag.selected,
+        .base-material-tag.selected {
+            background-color: #8B4513;
+            color: white;
+        }
+        
+        .search-button {
+            background-color: #8B4513;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .search-button:hover {
+            background-color: #6B3403;
+        }
+        
+        .results-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .results-container h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        
+        .recipe-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .recipe-card {
+            width: calc(25% - 12px);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .recipe-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .recipe-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #8B4513;
+        }
+        
+        .recipe-info {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .recipe-info strong {
+            display: inline-block;
+            width: 60px;
+        }
+        
+        .recipe-steps {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .recipe-steps h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .recipe-steps ol {
+            margin-left: 20px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .search-container,
+            .results-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>天国拯救2炼金配方检索</h1>
+        
+        <div class="search-container">
+            <div class="search-section">
+                <h2>按药剂名称查询</h2>
+                <div class="search-input-wrapper">
+                    <input type="text" id="name-search" class="search-input" placeholder="输入药剂名称...">
+                    <button class="clear-btn" onclick="clearInput('name-search')">&times;</button>
+                </div>
+            </div>
+            
+            <div class="search-section">
+                <h2>选择多项材料查询</h2>
+                <div class="materials-selector" id="materials-selector">
+                    <!-- 材料标签将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div class="search-section">
+                <h2>按底料查询</h2>
+                <div class="base-selector" id="base-selector">
+                    <div class="base-material-tag" data-base="水">水</div>
+                    <div class="base-material-tag" data-base="烈酒">烈酒</div>
+                    <div class="base-material-tag" data-base="葡萄酒">葡萄酒</div>
+                    <div class="base-material-tag" data-base="油">油</div>
+                </div>
+            </div>
+            <button class="search-button" onclick="searchRecipes()">搜索配方</button>
+        </div>
+        
+        <div class="results-container">
+            <h2>搜索结果</h2>
+            <div id="results">
+                <!-- 搜索结果将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 配方数据（包含材料数量）
+        const recipes = [
+            {
+                name: "解酒药剂（醒酒）",
+                base: "水",
+                materials: ["1鼠尾草", "1圣约翰草", "1薄荷"],
+                steps: [
+                    "将1鼠尾草和1圣约翰草加入锅中。",
+                    "熬煮三轮。",
+                    "研磨1薄荷后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可用于醒酒，高品质药剂则可缓解宿醉与酒精中毒，并完全恢复清醒。"
+            },
+            {
+                name: "亨家私酿酒",
+                base: "烈酒",
+                materials: ["2薄荷", "2艾草"],
+                steps: [
+                    "将2艾草加入锅中熬煮两轮。",
+                    "研磨2薄荷后将其加入锅中。",
+                    "熬煮一轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "亨利自家的私酿酒，虽口感浓烈，但定能让你神清气爽。"
+            },
+            {
+                name: "伊索药剂（骑术/训犬）",
+                base: "烈酒",
+                materials: ["1颠茄", "1野猪獠牙", "2紫草"],
+                steps: [
+                    "研磨2紫草后将其加入锅中。",
+                    "将1野猪獠牙加入锅中熬煮两轮。",
+                    "研磨1颠茄后将其加入锅中。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "可提升骑术以及训犬能力，高品质药剂还可让你不会轻易被动物察觉，且可避免犬类对你吠叫。"
+            },
+            {
+                name: "公鸡药剂（能量）",
+                base: "烈酒",
+                materials: ["1缬草", "2薄荷"],
+                steps: [
+                    "研磨2薄荷后加入锅中。",
+                    "熬煮一轮。",
+                    "将1缬草加入锅中熬煮两轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "恢复能量，高品质药剂还可减缓疲惫速度。"
+            },
+            {
+                name: "冥河之水（洗点）",
+                base: "烈酒",
+                materials: ["2艾草", "1颠茄", "1天仙子"],
+                steps: [
+                    "研磨2艾草后将其加入锅中。",
+                    "将1颠茄加入锅中熬煮三轮。",
+                    "加入1天仙子。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "重新分配技能点"
+            },
+            {
+                name: "薄荷香水（魅力）",
+                base: "葡萄酒",
+                materials: ["3蒲公英", "1金盏花", "1薄荷"],
+                steps: [
+                    "研磨3蒲公英和1薄荷后，将其加入锅中。",
+                    "熬煮两轮。",
+                    "将1金盏花加入锅中，用风箱熬煮一轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "此种香水气味清淡，但可长久留香。使用后可在较长时间内略微提升魅力值，若与其他香水混合使用将会降低魅力值。"
+            },
+            {
+                name: "夜鹰药剂（夜视）",
+                base: "水",
+                materials: ["2小米草", "1颠茄", "1甘菊"],
+                steps: [
+                    "研磨2小米草后将其加入锅中。",
+                    "将1颠茄加入锅中熬煮三轮。",
+                    "研磨1甘菊后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "你于黑暗中的视觉将得到提升，且能量消耗速度降低，高品质药剂可以避免能量消耗。"
+            },
+            {
+                name: "射手药剂（射箭）",
+                base: "烈酒",
+                materials: ["2小米草", "1圣约翰草"],
+                steps: [
+                    "将2小米草放入锅中熬煮三轮。",
+                    "研磨1圣约翰草后将其加入锅中。",
+                    "使用风箱将其熬煮一轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "提升射箭能力，高品质药剂还能降低瞄准时所需的耐力消耗。"
+            },
+            {
+                name: "巧手药剂（偷窃/工艺）",
+                base: "水",
+                materials: ["2小米草", "2缬草", "1蜘蛛网"],
+                steps: [
+                    "将1蜘蛛网和2小米草加入锅中熬煮三轮。",
+                    "研磨2缬草后将其加入锅中。",
+                    "熬煮一轮。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可提升偷窃和工艺技能。"
+            },
+            {
+                name: "救世干酒（存档）",
+                base: "葡萄酒",
+                materials: ["1荨麻", "2颠茄"],
+                steps: [
+                    "将1荨麻加入锅中熬煮两轮。",
+                    "研磨2颠茄。",
+                    "将研磨后的颠茄放入锅中熬煮一轮。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可用于保存游戏进度，且高品质药剂还能提升力量、活力和敏捷。"
+            },
+            {
+                name: "止痛药剂（治疗伤口）",
+                base: "烈酒",
+                materials: ["3罂粟", "1紫草", "1金盏花"],
+                steps: [
+                    "研磨3罂粟后将其加入锅中。",
+                    "将1金盏花加入锅中，并使用风箱将其熬煮一轮。",
+                    "将1紫草加入锅中熬煮两轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "减轻伤口带来的负面影响，并减缓最大耐力随生命值降低而减少的速度。"
+            },
+            {
+                name: "活络擦剂（敏捷）",
+                base: "油",
+                materials: ["1小米草", "1罂粟", "1缬草", "1野猪獠牙"],
+                steps: [
+                    "将1罂粟和1缬草加入锅中熬煮两轮。",
+                    "研磨1小米草后将其加入锅中。",
+                    "将1野猪獠牙加入锅中熬煮一轮。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可提升敏捷度，高品质药剂还可降低冲刺时所需的耐力消耗。"
+            },
+            {
+                name: "消化药剂（饱腹/食物中毒）",
+                base: "水",
+                materials: ["1荨麻", "2蓟草", "1木炭"],
+                steps: [
+                    "将2蓟草放入锅中熬煮两轮。",
+                    "研磨1荨麻后将其加入锅中。",
+                    "熬煮一轮。",
+                    "研磨1木炭后将其加入锅中。",
+                    "最后将药剂倒出即可。"
+                ],
+                effect: "可缓解饱腹感并治疗食物中毒，高品质药剂则能解除一切中毒效果，并让你感到活力四射。"
+            },
+            {
+                name: "狐狸药剂（口才）",
+                base: "油",
+                materials: ["1荨麻", "1圣约翰草", "1颠茄", "1木炭"],
+                steps: [
+                    "研磨1圣约翰草和1荨麻。",
+                    "将研磨好的材料加入锅中熬煮两轮。",
+                    "研磨1木炭后将其加入锅中。",
+                    "将1颠茄放入锅中熬煮一轮。",
+                    "最后倾倒即可。"
+                ],
+                effect: "提升口才能力，高品质药剂还可提高阅读速度，且当药剂品质最优时则提高经验获取量。"
+            },
+            {
+                name: "甘菊药剂（睡觉疗伤回能）",
+                base: "葡萄酒",
+                materials: ["2甘菊", "1鼠尾草"],
+                steps: [
+                    "将2甘菊加入锅中熬煮一轮。",
+                    "研磨1鼠尾草后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "睡眠可以更快地为你恢复伤势，如果睡眠状态良好，也会更快地恢复能量。"
+            },
+            {
+                name: "生命之水（减伤）",
+                base: "水",
+                materials: ["2蒲公英", "1金盏花"],
+                steps: [
+                    "将2蒲公英加入锅中熬煮一轮。",
+                    "研磨1金盏花后将其加入锅中。",
+                    "熬煮两轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "降低生命值损失，并减缓流血效果。"
+            },
+            {
+                name: "肥皂（洗衣）",
+                base: "油",
+                materials: ["2蓟草", "1蒲公英", "1木炭"],
+                steps: [
+                    "研磨2蓟草后将其加入锅中。",
+                    "熬煮两轮。",
+                    "将1蒲公英加入锅中熬煮一轮。",
+                    "研磨1木炭后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "洗衣服"
+            },
+            {
+                name: "艾蒿药剂（力量）",
+                base: "烈酒",
+                materials: ["2艾草", "1鼠尾草"],
+                steps: [
+                    "将1鼠尾草放入锅中熬煮一轮。",
+                    "研磨2艾草后将其加入锅中。",
+                    "熬煮两轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "提升2点力量，持续10分钟。"
+            },
+            {
+                name: "退烧药剂（缓解发热）",
+                base: "葡萄酒",
+                materials: ["3小白菊", "2生姜", "1接骨木莓叶"],
+                steps: [
+                    "将3小白菊加入锅中熬煮两轮。",
+                    "研磨1接骨木莓叶后将其加入锅中。",
+                    "加入2生姜。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "发烧及相关病症无疑会最终导致死亡，而及时服用此种药剂将可缓解发热症状。"
+            },
+            {
+                name: "金盏花药剂（回血）",
+                base: "水",
+                materials: ["1荨麻", "2金盏花"],
+                steps: [
+                    "将1荨麻加入锅中熬煮两轮。",
+                    "研磨2金盏花后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可缓慢恢复部分生命值，并可缓解宿醉效果，高品质药剂则可立即解除宿醉。"
+            },
+            {
+                name: "雄狮香水（魅力）",
+                base: "烈酒",
+                materials: ["2鼠尾草", "2薄荷"],
+                steps: [
+                    "将2鼠尾草加入锅中熬制两轮。",
+                    "研磨2薄荷后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "此种香水香飘十里，却难长久留香，其可在短时间内大幅度提升魅力值，若与其他香水混合使用将会降低魅力值。"
+            },
+            {
+                name: "雄鹿之血药剂（耐力）",
+                base: "油",
+                materials: ["1圣约翰草", "1蒲公英", "1紫草"],
+                steps: [
+                    "研磨1圣约翰草后将其加入锅中。",
+                    "将1紫草加入锅中熬煮一轮。",
+                    "将1蒲公英加入锅中，并使用风箱将其熬煮一轮。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可提升耐力值，高品质药剂还将提升耐力恢复速率。"
+            },
+            {
+                name: "安眠毒药",
+                base: "油",
+                materials: ["1罂粟", "1四叶重楼", "1蓟草"],
+                steps: [
+                    "将1罂粟加入锅中熬煮一轮。",
+                    "将1蓟草加入锅中熬煮一轮。",
+                    "研磨1四叶重楼后将其加入锅中。",
+                    "最后倾倒即可。"
+                ],
+                effect: "可将能量降至0，高品质药剂还将降低耐力的恢复速率。无论是用作餐中毒药还是涂抹武器都有奇效。"
+            },
+            {
+                name: "玩偶毒药",
+                base: "烈酒",
+                materials: ["1缬草", "2四叶重楼"],
+                steps: [
+                    "将2四叶重楼加入锅中熬煮三轮。",
+                    "研磨1缬草后将其加入锅中。",
+                    "熬煮两轮。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "可使人丧失奔跑能力，并削弱武器技能，高品质药剂还将减少目标生命值。相比于用作餐中毒药，将此药剂涂抹于武器上时，其效将更胜一筹。"
+            },
+            {
+                name: "祸根毒药",
+                base: "葡萄酒",
+                materials: ["1艾草", "2颠茄", "1毒蝇伞"],
+                steps: [
+                    "将1艾草加入锅中熬煮两轮。",
+                    "研磨2颠茄后将其加入锅中。",
+                    "使用风箱将其熬煮一轮。",
+                    "将1毒蝇伞加入锅中。",
+                    "最后蒸馏即可。"
+                ],
+                effect: "减少110生命值，服用后必死无疑，高品质药剂还将会使生命值更快地降低。相比于涂抹在武器上，把它洒进别人的餐食里才是明智之选。"
+            },
+            {
+                name: "散弹火药",
+                base: "水",
+                materials: ["1硫磺", "1硝石", "1浸泡炭"],
+                steps: [
+                    "研磨1硫磺和1硝石后将其加入锅中。",
+                    "熬煮三轮。",
+                    "研磨1浸泡炭后将其加入锅中。",
+                    "熬煮一轮。",
+                    "将材料倒入研钵中研磨。"
+                ],
+                effect: "用于发射铁屑等小型射弹的火药，可在短距离内随意击穿任意目标，但长距离难有杀伤力。出于安全考虑，装填时务必保持清醒。"
+            },
+            {
+                name: "铅弹火药",
+                base: "水",
+                materials: ["1硫磺", "1硝石", "1木炭"],
+                steps: [
+                    "研磨1硫磺和1硝石后将其加入锅中。",
+                    "熬煮两轮。",
+                    "研磨1木炭后将其加入锅中。",
+                    "熬煮两轮。",
+                    "将材料倒入研钵中研磨。"
+                ],
+                effect: "用于发射铅弹的火药，即便是最坚硬的板甲也无法承受如此火药轰出的近距离射击。出于安全考虑，装填时务必保持清醒。"
+            }
+        ];
+        
+        // 提取所有唯一材料（从包含数量的材料字符串中提取材料名称）
+        const allMaterials = new Set();
+        recipes.forEach(recipe => {
+            recipe.materials.forEach(material => {
+                // 提取材料名称（去除数量）
+                const materialName = material.replace(/^\d+/, '').trim();
+                allMaterials.add(materialName);
+            });
+        });
+        
+        // 生成材料选择标签
+        const materialsSelector = document.getElementById('materials-selector');
+        allMaterials.forEach(material => {
+            const tag = document.createElement('div');
+            tag.className = 'material-tag';
+            tag.textContent = material;
+            tag.onclick = () => {
+                tag.classList.toggle('selected');
+            };
+            materialsSelector.appendChild(tag);
+        });
+        
+        // 为底料选项添加点击事件（单选，但允许取消选择）
+        document.querySelectorAll('#base-selector .base-material-tag').forEach(tag => {
+            tag.onclick = () => {
+                const isSelected = tag.classList.contains('selected');
+                // 移除所有选中状态
+                document.querySelectorAll('#base-selector .base-material-tag').forEach(t => {
+                    t.classList.remove('selected');
+                });
+                // 如果之前未选中，则选中当前项；如果已选中，则保持取消状态
+                if (!isSelected) {
+                    tag.classList.add('selected');
+                }
+            };
+        });
+        
+        // 搜索配方
+        function searchRecipes() {
+            const nameSearch = document.getElementById('name-search').value.toLowerCase();
+            
+            // 获取选中的材料
+            const selectedMaterials = Array.from(document.querySelectorAll('.material-tag.selected'))
+                .map(tag => tag.textContent);
+            
+            // 获取选中的底料（单选）
+            const selectedBase = document.querySelector('#base-selector .base-material-tag.selected');
+            const selectedBaseValue = selectedBase ? selectedBase.getAttribute('data-base') : '';
+            
+            // 过滤配方
+            const filteredRecipes = recipes.filter(recipe => {
+                // 按名称搜索
+                const nameMatch = recipe.name.toLowerCase().includes(nameSearch);
+                
+                // 按选中的材料搜索（修改为包含任一选中材料）
+                const selectedMaterialsMatch = selectedMaterials.length === 0 || 
+                    selectedMaterials.some(selectedMaterial => 
+                        recipe.materials.some(material => 
+                            material.replace(/^\d+/, '').trim() === selectedMaterial
+                        )
+                    );
+                
+                // 按底料搜索（单选）
+                const baseMatch = selectedBaseValue === '' || 
+                    recipe.base === selectedBaseValue;
+                
+                return nameMatch && selectedMaterialsMatch && baseMatch;
+            });
+            
+            // 显示结果
+            const resultsContainer = document.getElementById('results');
+            if (filteredRecipes.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">没有找到匹配的配方</div>';
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="recipe-grid">
+                        ${filteredRecipes.map(recipe => `
+                            <div class="recipe-card" onclick="showRecipeDetails(${filteredRecipes.indexOf(recipe)})">
+                                <h3>${recipe.name}</h3>
+                                <div class="recipe-info">
+                                    <strong>底料：</strong>${recipe.base}<br>
+                                    <strong>材料：</strong>${recipe.materials.join('、')}<br>
+                                    <strong>效果：</strong>${recipe.effect}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+        
+        // 显示配方详情弹窗
+        function showRecipeDetails(index) {
+            const recipe = recipes[index];
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <h2>${recipe.name}</h2>
+                    <div class="recipe-info">
+                        <strong>底料：</strong>${recipe.base}<br>
+                        <strong>材料：</strong>${recipe.materials.join('、')}<br>
+                        <strong>效果：</strong>${recipe.effect}
+                    </div>
+                    <div class="recipe-steps">
+                        <h4>炼金步骤：</h4>
+                        <ol>
+                            ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                        </ol>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            // 点击模态框外部关闭
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.remove();
+                }
+            };
+        }
+        
+        // 清除输入框内容
+        function clearInput(inputId) {
+            document.getElementById(inputId).value = '';
+            searchRecipes();
+        }
+        
+        // 初始加载时显示所有配方
+        window.onload = searchRecipes;
+    </script>
+</body>
+</html>
