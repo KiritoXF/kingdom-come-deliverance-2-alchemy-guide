@@ -692,7 +692,7 @@
                 resultsContainer.innerHTML = `
                     <div class="recipe-grid">
                         ${filteredRecipes.map(recipe => `
-                            <div class="recipe-card" onclick="showRecipeDetails(${filteredRecipes.indexOf(recipe)})">
+                            <div class="recipe-card" onclick="showRecipeDetails(this)">
                                 <h3>${recipe.name}</h3>
                                 <div class="recipe-info">
                                     <strong>底料：</strong>${recipe.base}<br>
@@ -707,8 +707,9 @@
         }
         
         // 显示配方详情弹窗
-        function showRecipeDetails(index) {
-            const recipe = recipes[index];
+        function showRecipeDetails(element) {
+            const recipeName = element.querySelector('h3').textContent;
+            const recipe = recipes.find(r => r.name === recipeName);
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.innerHTML = `
