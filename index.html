@@ -172,6 +172,13 @@
             width: 60px;
         }
         
+        .material-highlight {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
         .recipe-steps {
             margin-top: 15px;
             font-size: 14px;
@@ -691,16 +698,24 @@
             } else {
                 resultsContainer.innerHTML = `
                     <div class="recipe-grid">
-                        ${filteredRecipes.map(recipe => `
-                            <div class="recipe-card" onclick="showRecipeDetails(this)">
-                                <h3>${recipe.name}</h3>
-                                <div class="recipe-info">
-                                    <strong>底料：</strong>${recipe.base}<br>
-                                    <strong>材料：</strong>${recipe.materials.join('、')}<br>
-                                    <strong>效果：</strong>${recipe.effect}
+                        ${filteredRecipes.map(recipe => {
+                            const materialsHtml = recipe.materials.map(material => {
+                                const materialName = material.replace(/^\d+/, '').trim();
+                                const isSelected = selectedMaterials.includes(materialName);
+                                return isSelected ? `<span class="material-highlight">${material}</span>` : material;
+                            }).join('、');
+                            
+                            return `
+                                <div class="recipe-card" onclick="showRecipeDetails(this)">
+                                    <h3>${recipe.name}</h3>
+                                    <div class="recipe-info">
+                                        <strong>底料：</strong>${recipe.base}<br>
+                                        <strong>材料：</strong>${materialsHtml}<br>
+                                        <strong>效果：</strong>${recipe.effect}
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 `;
             }
